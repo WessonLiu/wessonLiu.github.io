@@ -1037,19 +1037,19 @@
 
 
   
-    <article id="post-3.4 基于Feign实现服务调用" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-3.3 实现服务调用的负载均衡" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2021/10/26/3.4%20%E5%9F%BA%E4%BA%8EFeign%E5%AE%9E%E7%8E%B0%E6%9C%8D%E5%8A%A1%E8%B0%83%E7%94%A8/">feign</a>
+      <a class="article-title" href="/2021/10/26/3.3%20%E5%AE%9E%E7%8E%B0%E6%9C%8D%E5%8A%A1%E8%B0%83%E7%94%A8%E7%9A%84%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/">ribbon实现负载均衡</a>
     </h1>
   
 
         
-        <a href="/2021/10/26/3.4%20%E5%9F%BA%E4%BA%8EFeign%E5%AE%9E%E7%8E%B0%E6%9C%8D%E5%8A%A1%E8%B0%83%E7%94%A8/" class="archive-article-date">
+        <a href="/2021/10/26/3.3%20%E5%AE%9E%E7%8E%B0%E6%9C%8D%E5%8A%A1%E8%B0%83%E7%94%A8%E7%9A%84%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" class="archive-article-date">
   	<time datetime="2021-10-26T09:14:26.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-10-26</time>
 </a>
         
@@ -1057,45 +1057,58 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="什么是feign"><a href="#什么是feign" class="headerlink" title="什么是feign"></a>什么是feign</h3><p>​    Feign是Spring Cloud提供的一个声明式的伪Http客户端， 它使得调用远程服务就像调用本地服务一样简单， 只需要创建一个接口并添加一个注解即可。</p>
-<p>​    Nacos很好的兼容了Feign， Feign默认集成了 Ribbon， 所以在Nacos下使用Fegin默认就实现了负载均衡的效果。</p>
-<h3 id="1-Feign的使用-新建feign-client"><a href="#1-Feign的使用-新建feign-client" class="headerlink" title="1.Feign的使用 新建feign-client"></a>1.Feign的使用 新建feign-client</h3><p>1:配置pom.xml</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- web+ actuator --&gt;</span><br><span class="line">        &lt;dependency&gt;</span><br><span class="line">            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</span><br><span class="line">            &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;</span><br><span class="line">        &lt;/dependency&gt;</span><br><span class="line">        &lt;dependency&gt;</span><br><span class="line">            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</span><br><span class="line">            &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;</span><br><span class="line">        &lt;/dependency&gt;</span><br><span class="line">        &lt;!--nacos-discovery客户端--&gt;</span><br><span class="line">        &lt;dependency&gt;</span><br><span class="line">            &lt;groupId&gt;com.alibaba.cloud&lt;/groupId&gt;</span><br><span class="line">            &lt;artifactId&gt;spring-cloud-starter-alibaba-nacos-discovery&lt;/artifactId&gt;</span><br><span class="line">        &lt;/dependency&gt;</span><br><span class="line">        &lt;!--nacos-config客户端--&gt;</span><br><span class="line">        &lt;dependency&gt;</span><br><span class="line">            &lt;groupId&gt;com.alibaba.cloud&lt;/groupId&gt;</span><br><span class="line">            &lt;artifactId&gt;spring-cloud-starter-alibaba-nacos-config&lt;/artifactId&gt;</span><br><span class="line">        &lt;/dependency&gt;</span><br><span class="line">        &lt;!--fegin组件--&gt;</span><br><span class="line">        &lt;dependency&gt;</span><br><span class="line">            &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</span><br><span class="line">            &lt;artifactId&gt;spring-cloud-starter-openfeign&lt;/artifactId&gt;</span><br><span class="line">        &lt;/dependency&gt;</span><br><span class="line">        &lt;dependency&gt;</span><br><span class="line">            &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;</span><br><span class="line">            &lt;artifactId&gt;lombok&lt;/artifactId&gt;</span><br><span class="line">            &lt;version&gt;1.18.8&lt;/version&gt;</span><br><span class="line">        &lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
-
-<p>2:主启动</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">@SpringBootApplication</span><br><span class="line">@EnableDiscoveryClient</span><br><span class="line">@EnableFeignClients</span><br><span class="line">public class FeignClientApplication &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args)</span><br><span class="line">    &#123;</span><br><span class="line">        SpringApplication.run(FeignClientApplication.class,args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>3:业务类</p>
-<p>Controller代码，并启动验证</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">@RestController</span><br><span class="line">@Slf4j</span><br><span class="line">@RequestMapping(&quot;feign&quot;)</span><br><span class="line">public class FeignController &#123;</span><br><span class="line"></span><br><span class="line">    @Value(&quot;$&#123;server.port&#125;&quot;)</span><br><span class="line">    private String port;</span><br><span class="line"></span><br><span class="line">    @GetMapping(&quot;sayHi&quot;)</span><br><span class="line">    public String sayHi()&#123;</span><br><span class="line">        return port;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="创建feign-consumer"><a href="#创建feign-consumer" class="headerlink" title="创建feign-consumer"></a>创建feign-consumer</h3><p>1:配置pom.xml</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- web+ actuator --&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line">    &lt;!--nacos-discovery客户端--&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">        &lt;groupId&gt;com.alibaba.cloud&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;spring-cloud-starter-alibaba-nacos-discovery&lt;/artifactId&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line">    &lt;!--nacos-config客户端--&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">        &lt;groupId&gt;com.alibaba.cloud&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;spring-cloud-starter-alibaba-nacos-config&lt;/artifactId&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line"></span><br><span class="line">    &lt;!--fegin组件--&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">        &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;spring-cloud-starter-openfeign&lt;/artifactId&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">        &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;lombok&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;1.18.8&lt;/version&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
-
-<p>2:主启动</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">@SpringBootApplication</span><br><span class="line">@EnableDiscoveryClient</span><br><span class="line">@EnableFeignClients</span><br><span class="line">public class FeignConsumerApplication &#123;</span><br><span class="line">    public static void main(String[] args)&#123;</span><br><span class="line">        SpringApplication.run(FeignConsumerApplication.class,args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>3:业务类</p>
-<p>创建一个service,并且使用feign实现微服务调用。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">@FeignClient(&quot;feign-client&quot;)</span><br><span class="line">public interface IService &#123;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 测试方法。</span><br><span class="line">     *</span><br><span class="line">     * @return Result&lt;XxxxDO&gt;</span><br><span class="line">     */</span><br><span class="line">    @GetMapping(&quot;/feign/sayHi&quot;)</span><br><span class="line">    String sayHi();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>Controller代码，并启动验证</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">@RestController</span><br><span class="line">public class Controller &#123;</span><br><span class="line"></span><br><span class="line">    @Resource</span><br><span class="line">    private IService service;</span><br><span class="line"></span><br><span class="line">    @GetMapping(&quot;/sayHi&quot;)</span><br><span class="line">    public String sayHi() &#123;</span><br><span class="line"></span><br><span class="line">        return service.sayHi();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>4:进行测试。</p>
-<h3 id="feign进阶"><a href="#feign进阶" class="headerlink" title="feign进阶"></a>feign进阶</h3><p>服务调用和超时重试（底层采用的是<strong>ribbon</strong>进行）</p>
-<p>根据下面的极限值。可以得到，最大超时时间是：27000毫秒。（2000 + 1000<strong>）*（</strong>2 + 1<strong>）*（</strong>2 + 1<strong>）</strong>= 27000ms</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">feign-service-provider.ribbon.OkToRetryOnAllOperations=true</span><br><span class="line">feign-service-provider.ribbon.ConnectTimeout=1000</span><br><span class="line">feign-service-provider.ribbon.ReadTimeout=2000</span><br><span class="line">feign-service-provider.ribbon.MaxAutoRetries=2</span><br><span class="line">feign-service-provider.ribbon.MaxAutoRetriesNextServer=2</span><br></pre></td></tr></table></figure>
-
-<p><strong>OkToRetryOnAllOperations</strong>这个参数指定了什么HTTP Method可以进行Retry，这里为了演示方便才设置为true，表示不管GET还是POST什么都能重试。真实的生产环境往往只是GET请求可以重试，或者实现了幂等性的其他类型请求。</p>
-<p><strong>ConnectTimeout</strong>：超时判定的第一个参数（单位ms），创建会话的连接时间。注意，这个不是服务的响应时间，而是本机和服务建立一个Connection所花费的时间，如果连接超时则直接进行重试。</p>
-<p><strong>ReadTimeout</strong>：超时判定的第二个参数，服务响应时间。当连接建立好之后，如果对方服务没有在规定时间内返回，则直接进行重试<strong>MaxAutoRetries</strong>：求极限关键参数之一，当前节点重试次数。这里重试次数为2，那么在首次调用超时以后，会再次向同一个服务节点发起最多2次重试（总共向当前节点1+2=3次请求）。</p>
-<p><strong>MaxAutoRetriesNextServer</strong>：求极限关键参数之二，换N个节点重试。这里N=2，就是说在当前机器调用超时后，Feign将最多换N台机器发起调用（注意，这里将和第一个参数共同作用，也就是说，在新机器上超时后，会继续重试MaxAutoRetries+1次）。</p>
-<p> 求极限超时值算法：</p>
-<p>MAX(Response Time) = (ConnectTimeout + ReadTimeout) * (MaxAutoRetries + 1) * (MaxAutoRetriesNextServer + 1)</p>
-<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><ul>
-<li>如果调用方引入接口层后发生版本冲突导致项目启动失败的话，需要调用方排除导致冲突的依赖包（在pom中使用exclude排除冲突项）</li>
+        <h3 id="Ribbon实现负载均衡"><a href="#Ribbon实现负载均衡" class="headerlink" title="Ribbon实现负载均衡"></a>Ribbon实现负载均衡</h3><p><strong>Ribbon负载均衡策略默认是，轮询。负载均衡核心概念</strong>： 雨露均沾，不能让某个人太累了，要累一起累。</p>
+<ul>
+<li>配置pom.xml包文件</li>
 </ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;spring-cloud-starter-netflix-ribbon&lt;/artifactId&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>yml配置 </li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 调用的提供者的名称</span><br><span class="line">cloud-payment-clent:</span><br><span class="line">  ribbon:</span><br><span class="line">    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>主启动</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">@SpringBootApplication</span><br><span class="line">@EnableDiscoveryClient</span><br><span class="line">public class RibbonConsumerApplication &#123;</span><br><span class="line"></span><br><span class="line">    @Bean</span><br><span class="line">    @LoadBalanced</span><br><span class="line">    public RestTemplate template() &#123;</span><br><span class="line">    		// 进行注入，可以进行访问</span><br><span class="line">        return new RestTemplate();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        new SpringApplicationBuilder(RibbonConsumerApplication.class)</span><br><span class="line">                .web(WebApplicationType.SERVLET)</span><br><span class="line">                .run(args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>业务类 进行访问</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">@RestController</span><br><span class="line">public class Controller &#123;</span><br><span class="line"></span><br><span class="line">    @Autowired</span><br><span class="line">    private RestTemplate restTemplate;</span><br><span class="line"></span><br><span class="line">    @GetMapping(&quot;/sayHi&quot;)</span><br><span class="line">    public String sayHi() &#123;</span><br><span class="line">        return restTemplate.getForObject(</span><br><span class="line">                &quot;http://cloud-payment-clent/sayHi&quot;,</span><br><span class="line">                String.class);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="知识点"><a href="#知识点" class="headerlink" title="知识点"></a>知识点</h3><p> ribbon及有懒加载，第一次去调用时才初始化LoadBalance，如果http方法本身比较耗时，再加上loadbalance创建耗时，而且超时时间又设置的比较短，很可能出现第一次http调用失败。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ribbon.eager-load.enabled=true </span><br><span class="line">ribbon.eager-load.clients=ribbon-consumer</span><br></pre></td></tr></table></figure>
+
+<p>开启饿汉模式加载Ribbon </p>
+<h4 id="有7种策略模式"><a href="#有7种策略模式" class="headerlink" title="有7种策略模式"></a>有7种策略模式</h4><ol>
+<li>  随性而为</li>
+<li>  按部就班</li>
+<li>  卷土重来</li>
+<li>  能者多劳</li>
+<li>  让最闲的人来</li>
+<li>  我是有底线的</li>
+<li>  我的地盘我作主</li>
+</ol>
+<h4 id="负载均衡策略配置"><a href="#负载均衡策略配置" class="headerlink" title="负载均衡策略配置"></a>负载均衡策略配置</h4><ol>
+<li>第一种：全局配置</li>
+<li>第二种：指定服务配置（优先级更高）  指定服务注解配置（优先级最高）</li>
+</ol>
+<h3 id="核心概念"><a href="#核心概念" class="headerlink" title="核心概念"></a>核心概念</h3><h5 id="负载均衡"><a href="#负载均衡" class="headerlink" title="负载均衡"></a>负载均衡</h5><p>​    一般由<strong>客户端和服务端两种负载均衡搭配使用</strong></p>
+<h5 id="客户端负载均衡"><a href="#客户端负载均衡" class="headerlink" title="客户端负载均衡"></a>客户端负载均衡</h5><ol>
+<li>开发团队灵活修改</li>
+<li>运维成本低</li>
+<li>强依赖注册中心</li>
+<li>微服务框架</li>
+</ol>
+<h5 id="服务端负载均衡"><a href="#服务端负载均衡" class="headerlink" title="服务端负载均衡"></a>服务端负载均衡</h5><ol>
+<li>NetOpts把控修改</li>
+<li>运维成本高</li>
+<li>通常不依赖注册中心</li>
+</ol>
 
       
 
@@ -1131,7 +1144,7 @@
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2021/10/26/3.4%20%E5%9F%BA%E4%BA%8EFeign%E5%AE%9E%E7%8E%B0%E6%9C%8D%E5%8A%A1%E8%B0%83%E7%94%A8/">展开全文 >></a>
+          <a class="article-more-a" href="/2021/10/26/3.3%20%E5%AE%9E%E7%8E%B0%E6%9C%8D%E5%8A%A1%E8%B0%83%E7%94%A8%E7%9A%84%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/">展开全文 >></a>
         </p>
       
 
