@@ -6,13 +6,17 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://example.com">
-  <title>Archives: 2021 | Hexo</title>
+  <title>Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
+  <meta name="description" content="1.2 微服务架构介绍 微服务架构， 简单的说就是将单体应用进一步拆分，拆分成更小的服务，每个服务都是一个可以独 立运行的项目。 1.2.1 微服务架构的常见问题 一旦采用微服务系统架构，就势必会遇到这样几个问题： 这么多小服务，如何管理他们？(服务治理 注册中心[服务注册 发现 剔除]) 这么多小服务，他们之间如何通讯？(restful rpc) 这么多小服务，客户端怎么访问他们？(网关) 这么">
+<meta property="og:type" content="article">
 <meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://example.com/archives/2021/index.html">
+<meta property="og:url" content="http://example.com/2021/11/08/1.2%20%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84%E4%BB%8B%E7%BB%8D/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="1.2 微服务架构介绍 微服务架构， 简单的说就是将单体应用进一步拆分，拆分成更小的服务，每个服务都是一个可以独 立运行的项目。 1.2.1 微服务架构的常见问题 一旦采用微服务系统架构，就势必会遇到这样几个问题： 这么多小服务，如何管理他们？(服务治理 注册中心[服务注册 发现 剔除]) 这么多小服务，他们之间如何通讯？(restful rpc) 这么多小服务，客户端怎么访问他们？(网关) 这么">
 <meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-11-08T12:57:05.499Z">
+<meta property="article:modified_time" content="2021-11-08T12:57:05.499Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
   
@@ -150,293 +154,225 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-1.2 微服务架构介绍" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><strong>1.2</strong> <strong>微服务架构介绍</strong></p>
+<p>微服务架构， 简单的说就是将单体应用进一步拆分，拆分成更小的服务，每个服务都是一个可以独</p>
+<p>立运行的项目。</p>
+<p><strong>1.2.1</strong> <strong>微服务架构的常见问题</strong></p>
+<p>一旦采用微服务系统架构，就势必会遇到这样几个问题：</p>
+<p>这么多小服务，如何管理他们？(服务治理 注册中心[服务注册 发现 剔除])</p>
+<p>这么多小服务，他们之间如何通讯？(<strong>restful</strong> rpc)</p>
+<p>这么多小服务，客户端怎么访问他们？(网关)</p>
+<p>这么多小服务，一旦出现问题了，应该如何自处理？(容错)</p>
+<p>这么多小服务，一旦出现问题了，应该如何排错? (链路追踪)</p>
+<p>对于上面的问题，是任何一个微服务设计者都不能绕过去的，因此大部分的微服务产品都针对每一</p>
+<p>个问题提供了相应的组件来解决它们。<strong>1.2.2</strong> <strong>微服务架构的常见概念</strong></p>
+<p><strong>1.2.2.1</strong> <strong>服务治理</strong></p>
+<p>服务治理就是进行服务的自动化管理，其核心是服务的自动注册与发现。</p>
+<p><strong>服务注册</strong>：服务实例将自身服务信息注册到注册中心。</p>
+<p><strong>服务发现</strong>：服务实例通过注册中心，获取到注册到其中的服务实例的信息，通过这些信息去请求它们提</p>
+<p>供的服务。</p>
+<p><strong>服务剔除</strong>：服务注册中心将出问题的服务自动剔除到可用列表之外，使其不会被调用到。<strong>1.2.2.2</strong> <strong>服务调用</strong></p>
+<p>在微服务架构中，通常存在多个服务之间的远程调用的需求。目前主流的远程调用技术有基于</p>
+<p>HTTP的RESTful接口以及基于TCP的RPC协议。</p>
+<p><strong>REST</strong>(Representational State Transfer)</p>
+<p>这是一种HTTP调用的格式，更标准，更通用，无论哪种语言都支持http协议</p>
+<p><strong>RPC</strong>（Remote Promote Call）</p>
+<p>一种进程间通信方式。允许像调用本地服务一样调用远程服务。RPC框架的主要目标就是让远程服</p>
+<p>务调用更简单、透明。RPC框架负责屏蔽底层的传输方式、序列化方式和通信细节。开发人员在使</p>
+<p>用的时候只需要了解谁在什么位置提供了什么样的远程服务接口即可，并不需要关心底层通信细节</p>
+<p>和调用过程。</p>
+<p><strong>区别与联系****比较项</strong> <strong>RESTful RPC</strong></p>
+<p>通讯协议 HTTP 一般使用TCP</p>
+<p>性能 略低 较高</p>
+<p>灵活度 高 低</p>
+<p>应用 微服务架构 SOA架构</p>
+<p><strong>1.2.2.3</strong> <strong>服务网关</strong></p>
+<p>随着微服务的不断增多，不同的微服务一般会有不同的网络地址，而外部客户端可能需要调用多个</p>
+<p>服务的接口才能完成一个业务需求，如果让客户端直接与各个微服务通信可能出现：</p>
+<p>客户端需要调用不同的url地址，增加难度</p>
+<p>在一定的场景下，存在跨域请求的问题</p>
+<p>每个微服务都需要进行单独的身份认证</p>
+<p>针对这些问题，API网关顺势而生。</p>
+<p>API网关直面意思是将所有API调用统一接入到API网关层，由网关层统一接入和输出。一个网关的</p>
+<p>基本功能有：统一接入、安全防护、协议适配、流量管控、长短链接支持、容错能力。有了网关之后，</p>
+<p>各个API服务提供团队可以专注于自己的的业务逻辑处理，而API网关更专注于安全、流量、路由等问</p>
+<p>题。</p>
+<p><strong>1.2.2.4</strong> <strong>服务容错</strong></p>
+<p>在微服务当中，一个请求经常会涉及到调用几个服务，如果其中某个服务不可用，没有做服务容错</p>
+<p>的话，极有可能会造成一连串的服务不可用，这就是雪崩效应。</p>
+<p>我们没法预防雪崩效应的发生，只能尽可能去做好容错。服务容错的三个核心思想是：</p>
+<p>不被外界环境影响</p>
+<p>不被上游请求压垮不被下游响应拖垮</p>
+<p><strong>1.2.2.5</strong> <strong>链路追踪</strong></p>
+<p>随着微服务架构的流行，服务按照不同的维度进行拆分，一次请求往往需要涉及到多个服务。互联</p>
+<p>网应用构建在不同的软件模块集上，这些软件模块，有可能是由不同的团队开发、可能使用不同的编程</p>
+<p>语言来实现、有可能布在了几千台服务器，横跨多个不同的数据中心。因此，就需要对一次请求涉及的</p>
+<p>多个服务链路进行日志记录，性能监控即链路追踪</p>
+<p><strong>1.2.3</strong> <strong>微服务架构的常见解决方案</strong></p>
+<p><strong>1.2.3.1 ServiceComb</strong>Apache ServiceComb，前身是华为云的微服务引擎 CSE (Cloud Service Engine) 云服务，是全球</p>
+<p>首个Apache微服务顶级项目。它提供了一站式的微服务开源解决方案，致力于帮助企业、用户和开发</p>
+<p>者将企业应用轻松微服务化上云，并实现对微服务应用的高效运维管理。</p>
+<p><strong>1.2.3.2 SpringCloud</strong></p>
+<p>Spring Cloud是一系列框架的集合。它利用Spring Boot的开发便利性巧妙地简化了分布式系统基</p>
+<p>础设施的开发，如服务发现注册、配置中心、消息总线、负载均衡、断路器、数据监控等，都可以用</p>
+<p>Spring Boot的开发风格做到一键启动和部署。</p>
+<p>Spring Cloud并没有重复制造轮子，它只是将目前各家公司开发的比较成熟、经得起实际考验的服</p>
+<p>务框架组合起来，通过Spring Boot风格进行再封装屏蔽掉了复杂的配置和实现原理，最终给开发者留</p>
+<p>出了一套简单易懂、易部署和易维护的分布式系统开发工具包。</p>
+<p><strong>1.2.3.3 SpringCloud Alibaba</strong>Spring Cloud Alibaba 致力于提供微服务开发的一站式解决方案。此项目包含开发分布式应用微服</p>
+<p>务的必需组件，方便开发者通过 Spring Cloud 编程模型轻松使用这些组件来开发分布式应用服务。</p>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/WessonLiu/image/img/202110281956933.png">
+                      <span class="reward-type">支付宝</span>
+                    </div>
+                    
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/WessonLiu/image/img/202110282034629.png">
+                      <span class="reward-type">微信</span>
+                    </div>
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
       
       
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2021" class="archive-year">2021</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/11/29/6.1Sleuth--%E9%93%BE%E8%B7%AF%E8%BF%BD%E8%B8%AA/" class="archive-article-date">
-  	<time datetime="2021-11-29T13:46:46.548Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-11-29</time>
-</a>
-        </div>
-    	 
-        <div class="article-info info-on-right">
-          
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://example.com/2021/11/08/1.2%20%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84%E4%BB%8B%E7%BB%8D/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/11/29/5.1%20Gateway%E6%9C%8D%E5%8A%A1%E7%BD%91%E5%85%B3/" class="archive-article-date">
-  	<time datetime="2021-11-29T13:43:59.337Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-11-29</time>
-</a>
-        </div>
-    	 
-        <div class="article-info info-on-right">
-          
-          
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/11/29/4.1%20Sentinel--%E6%9C%8D%E5%8A%A1%E5%AE%B9%E9%94%99/" class="archive-article-date">
-  	<time datetime="2021-11-29T13:39:30.469Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-11-29</time>
-</a>
-        </div>
-    	 
-        <div class="article-info info-on-right">
-          
-          
+<nav id="article-nav">
+  
+    <a href="/2021/11/08/1.1%E5%BE%AE%E6%9C%8D%E5%8A%A1%E4%BB%8B%E7%BB%8D/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2021/10/26/3.2nacos%E5%AE%9E%E6%88%98%E5%85%A5%E9%97%A8/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">nacos环境搭建</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/11/24/2.1%20%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%A1%86%E6%9E%B6%E6%90%AD%E5%BB%BA/" class="archive-article-date">
-  	<time datetime="2021-11-24T12:34:52.569Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-11-24</time>
-</a>
-        </div>
-    	 
-        <div class="article-info info-on-right">
-          
-          
 
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/11/21/3.1%E6%9C%8D%E5%8A%A1%E6%B2%BB%E7%90%86%E4%BB%8B%E7%BB%8D/" class="archive-article-date">
-  	<time datetime="2021-11-21T07:04:08.185Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-11-21</time>
-</a>
-        </div>
-    	 
-        <div class="article-info info-on-right">
-          
-          
+        
+        
+    </div>
+</aside>
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/11/09/1.3SpringCloud%20Alibaba%E4%BB%8B%E7%BB%8D/" class="archive-article-date">
-  	<time datetime="2021-11-09T14:53:06.218Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-11-09</time>
-</a>
-        </div>
-    	 
-        <div class="article-info info-on-right">
-          
-          
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/11/08/1.1%E5%BE%AE%E6%9C%8D%E5%8A%A1%E4%BB%8B%E7%BB%8D/" class="archive-article-date">
-  	<time datetime="2021-11-08T12:57:11.121Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-11-08</time>
-</a>
-        </div>
-    	 
-        <div class="article-info info-on-right">
-          
-          
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/11/08/1.2%20%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84%E4%BB%8B%E7%BB%8D/" class="archive-article-date">
-  	<time datetime="2021-11-08T12:57:05.499Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-11-08</time>
-</a>
-        </div>
-    	 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/10/26/3.2nacos%E5%AE%9E%E6%88%98%E5%85%A5%E9%97%A8/" class="archive-article-date">
-  	<time datetime="2021-10-26T09:14:26.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-10-26</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/10/26/3.2nacos%E5%AE%9E%E6%88%98%E5%85%A5%E9%97%A8/">nacos环境搭建</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">学习笔记</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">框架搭建</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">微服务</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/10/26/3.3%20%E5%AE%9E%E7%8E%B0%E6%9C%8D%E5%8A%A1%E8%B0%83%E7%94%A8%E7%9A%84%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" class="archive-article-date">
-  	<time datetime="2021-10-26T09:14:26.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-10-26</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/10/26/3.3%20%E5%AE%9E%E7%8E%B0%E6%9C%8D%E5%8A%A1%E8%B0%83%E7%94%A8%E7%9A%84%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/">ribbon实现负载均衡</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">学习笔记</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">框架搭建</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">微服务</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
   
 
-    
-    <nav id="page-nav">
-      <span class="page-number current">1</span><a class="page-number" href="/archives/2021/page/2/">2</a><a class="extend next" rel="next" href="/archives/2021/page/2/">Next &amp;raquo;</a>
-    </nav>
   
 
 
@@ -460,8 +396,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
